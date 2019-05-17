@@ -35,11 +35,11 @@ export default class BaseTileLayer extends CompositeLayer {
 
   updateState({props, oldProps, context, changeFlags}) {
     let {tileCache} = this.state;
-    if (
+    const createNewCache =
       !tileCache ||
       (changeFlags.updateTriggersChanged &&
-        (changeFlags.updateTriggersChanged.all || changeFlags.updateTriggersChanged.getTileData))
-    ) {
+        (changeFlags.updateTriggersChanged.all || changeFlags.updateTriggersChanged.getTileData));
+    if (createNewCache) {
       const {
         getTileData,
         maxZoom,
@@ -70,7 +70,10 @@ export default class BaseTileLayer extends CompositeLayer {
     }
 
     const {viewport} = context;
-    if (changeFlags.viewportChanged && viewport.id !== 'DEFAULT-INITIAL-VIEWPORT') {
+    if (
+      createNewCache ||
+      (changeFlags.viewportChanged && viewport.id !== 'DEFAULT-INITIAL-VIEWPORT')
+    ) {
       const z = this.getLayerZoomLevel();
       tileCache.update(viewport);
       // The tiles that should be displayed at this zoom level
